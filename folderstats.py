@@ -40,8 +40,8 @@ def _recursive_folderstats(folderpath, items=None, hash_name=None,
             filepath = os.path.join(folderpath, f)
             idx += 1
             
-            #First check the file has read permission
-            if os.access(filepath, os.R_OK):
+            #Try to read the filepath 
+            try:   
             
                 stats = os.stat(filepath)
                 foldersize += stats.st_size
@@ -68,8 +68,9 @@ def _recursive_folderstats(folderpath, items=None, hash_name=None,
                         item.append(calculate_hash(filepath, hash_name))
                     items.append(item)
                     num_files += 1
+            
             #If the file does not have read permissions keep the name but set all proporties to None
-            else:
+            except Exception:
                 print("File is not readable:",filepath)    
                 filename, extension = os.path.splitext(f)
                 extension = extension[1:] if extension else None
