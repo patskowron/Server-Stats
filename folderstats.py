@@ -38,28 +38,44 @@ def _recursive_folderstats(folderpath, items=None, hash_name=None,
                 continue
 
             filepath = os.path.join(folderpath, f)
-            stats = os.stat(filepath) #I wonder what happens here is the file is not readable or is deleted between the directory listing and per file iteration
-            foldersize += stats.st_size
             idx += 1
+            
+            #First check the file has read permission
+            if os.access(filepath, os.R_OK):
+            
+                stats = os.stat(filepath)
+                foldersize += stats.st_size
+                 
+                #If its a directory call the recursive function again
+                if os.path.isdir(filepath):
+                    if verbose:
+                        print('FOLDER : {}'.format(filepath))
 
-            if os.path.isdir(filepath):
-                if verbose:
-                    print('FOLDER : {}'.format(filepath))
-
-                idx, items, _foldersize, _num_files = _recursive_folderstats(
-                    filepath, items, hash_name,
-                    ignore_hidden, depth + 1, idx, current_idx, verbose)
-                foldersize += _foldersize
-                num_files += _num_files
+                    idx, items, _foldersize, _num_files = _recursive_folderstats(
+                        filepath, items, hash_name,
+                        ignore_hidden, depth + 1, idx, current_idx, verbose)
+                    foldersize += _foldersize
+                    num_files += _num_files
+                #If its a file append information to array
+                else:
+                    filename, extension = os.path.splitext(f)
+                    extension = extension[1:] if extension else None
+                    item = [idx, filepath, f, extension, stats.st_size,
+                            stats.st_atime, stats.st_mtime, stats.st_ctime,
+                            False, None, depth, current_idx, stats.st_uid, stats.st_ino, 
+                            stats.st_nlink, stat.filemode(stats.st_mode)]
+                    if hash_name:
+                        item.append(calculate_hash(filepath, hash_name))
+                    items.append(item)
+                    num_files += 1
+            #If the file does not have read permissions keep the name but set all proporties to None
             else:
+                print("File is not readable:",filepath)    
                 filename, extension = os.path.splitext(f)
                 extension = extension[1:] if extension else None
-                item = [idx, filepath, f, extension, stats.st_size,
-                        stats.st_atime, stats.st_mtime, stats.st_ctime,
-                        False, None, depth, current_idx, stats.st_uid, stats.st_ino, 
-                        stats.st_nlink, stat.filemode(stats.st_mode)]
-                if hash_name:
-                    item.append(calculate_hash(filepath, hash_name))
+                item = [idx, filepath, f, extension, None,
+                        0, 0, 0, False, None, None, 
+                        None, None, None, None, None]
                 items.append(item)
                 num_files += 1
     else:
