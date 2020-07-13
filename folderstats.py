@@ -1,4 +1,5 @@
 import os
+import stat
 import hashlib
 import pandas as pd
 from datetime import datetime
@@ -55,7 +56,8 @@ def _recursive_folderstats(folderpath, items=None, hash_name=None,
                 extension = extension[1:] if extension else None
                 item = [idx, filepath, f, extension, stats.st_size,
                         stats.st_atime, stats.st_mtime, stats.st_ctime,
-                        False, None, depth, current_idx, stats.st_uid, stats.st_ino, stats.st_nlink]
+                        False, None, depth, current_idx, stats.st_uid, stats.st_ino, 
+                        stats.st_nlink, stat.filemode(stats.st_mode)]
                 if hash_name:
                     item.append(calculate_hash(filepath, hash_name))
                 items.append(item)
@@ -63,12 +65,14 @@ def _recursive_folderstats(folderpath, items=None, hash_name=None,
     else:
         print("Cannot enter folder:",folderpath)
 
-    #Why arn't these immediatly determined when the folder is tested for read permissions            
+    #Properties of the original input folder
+    #It is here because it needs to keep tally of the number and size or all files in it  
     stats = os.stat(folderpath)
     foldername = os.path.basename(folderpath)
     item = [current_idx, folderpath, foldername, None, foldersize,
             stats.st_atime, stats.st_mtime, stats.st_ctime,
-            True, num_files, depth, parent_idx, stats.st_uid, stats.st_ino, stats.st_nlink]
+            True, num_files, depth, parent_idx, stats.st_uid, stats.st_ino, 
+            stats.st_nlink, stat.filemode(stats.st_mode)]
     if hash_name:
         item.append(None)
     items.append(item)
@@ -83,7 +87,7 @@ def folderstats(folderpath, hash_name=None, microseconds=False,
     
     columns = ['id', 'path', 'name', 'extension', 'size',
                'atime', 'mtime', 'ctime',
-               'folder', 'num_files', 'depth', 'parent', 'uid', 'inode', 'num_hard_links']
+               'folder', 'num_files', 'depth', 'parent', 'uid', 'inode', 'num_hard_links', 'permissions']
     if hash_name:
         hash_name = hash_name.lower()
         columns.append(hash_name)

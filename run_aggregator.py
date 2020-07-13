@@ -38,3 +38,4 @@ df.to_csv(df_output, sep="\t", index=False)
 
 #Some questions to answer
 # - If I folder does not have read permissions can I still call a os.stat() on the folder itself
+#folderpath="/hpf/largeprojects/vijaylab"
