@@ -168,3 +168,12 @@ def equisum_partition(arr,p, ignore):
         start=idx
 
     return parts, partsum
+
+
+def calculate_hash_wrapper(file, size):
+    
+    startTime = datetime.now()
+    md5=calculate_hash(file) 
+    print(file, "\t",md5, "\t", size, (datetime.now() - startTime).total_seconds())
+    
+    return md5
