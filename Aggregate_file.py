@@ -15,8 +15,7 @@ directories=[d for d in os.listdir(top_level_dir) if os.path.isdir(os.path.join(
 
 # For each top level directory I want to aggregate all the file names and proporties in parallel
 # This might be best acheived with a qsub script submission on each top level directory
-
-output_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.10.2020"
+output_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020"
 src_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Scripts/"
 
 for d in directories:

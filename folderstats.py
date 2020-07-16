@@ -3,11 +3,12 @@ import stat
 import hashlib
 import pandas as pd
 from datetime import datetime
+import numpy as np
 
 def testing_functions():
     print ("Working fine!!")
 
-def calculate_hash(filepath, hash_name):
+def calculate_hash(filepath, hash_name="md5"):
     """Calculate the hash of a file. The available hashes are given by the hashlib module. The available hashes can be listed with hashlib.algorithms_available."""
 
     hash_name = hash_name.lower()
@@ -15,12 +16,18 @@ def calculate_hash(filepath, hash_name):
         raise Exception('Hash algorithm not available : {}'\
             .format(hash_name))
 
-    with open(filepath, 'rb') as f:
-        checksum = getattr(hashlib, hash_name)()
-        for chunk in iter(lambda: f.read(4096), b''):
-            checksum.update(chunk)
+    try:
+    
+        with open(filepath, 'rb') as f:
+            checksum = getattr(hashlib, hash_name)()
+            for chunk in iter(lambda: f.read(4096), b''):
+                checksum.update(chunk)
 
-        return checksum.hexdigest()
+            return checksum.hexdigest()
+    
+    except IsADirectoryError:
+        
+        return None
 
 
 def _recursive_folderstats(folderpath, items=None, hash_name=None,
@@ -129,3 +136,35 @@ def folderstats(folderpath, hash_name=None, microseconds=False,
         df.drop(columns=['id', 'parent'], inplace=True)
 
     return df
+
+
+def equisum_partition(arr,p, ignore):
+    
+    #MUST RANDOMIZE INPUT ARRAY FIRST
+
+    #arr and ignore have the same length, ignore is type bolean and specifies /
+    # if the elements in arr should be included in calculation. 
+    arr[ignore]=0
+    
+    #cumulative sum of data as you iterate throught the array
+    ac = np.nancumsum(arr)
+
+    #sum of the entire array decided by the number of clusters requested
+    partsum = ac[-1]//p 
+
+    #generates the cumulative sums of each part
+    cumpartsums = np.array(range(1,p))*partsum
+
+    #finds the indices where the cumulative sums are sandwiched
+    inds = np.searchsorted(ac,cumpartsums) 
+
+    #return a array with labels 1:p for each of the corresponding clusters
+    parts=np.zeros(arr.shape[0])
+    start=0
+    cluster=1
+    for idx in np.concatenate((inds,arr.shape[0]),axis=None):
+        parts[start:idx]=cluster
+        cluster+=1
+        start=idx
+
+    return parts, partsum
