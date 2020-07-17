@@ -1,10 +1,11 @@
 from folderstats import *
-import multiprocessing as mp
+from qsub import *
 from datetime import datetime
 import numpy as np
 from pathlib import Path
 import pandas as pd
 import humanize
+
 
 #Global paths
 src_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Scripts/" #Where the scripts are stored
@@ -50,20 +51,11 @@ for i in range(1,splits+1):
     out.to_csv(outfileprefix + "txt", sep="\t", index=False)
     
     #Creating md5 script for qsub submission
-    cmd="python {}run_md5_parallized.py {}.txt {} {}.md5".format(src_dir, outfileprefix, cores, outfileprefix)
-    print(outfilename)
-    print(cmd)
+    cmd="python {}run_md5_parallized.py {}.txt {}.md5 {}".format(src_dir, outfileprefix, outfileprefix, cores)
+    #rint(outfilename)
+    #rint(cmd)
+    
+    q_print([cmd], t=24, vmem=20, mem=20, out = outfileprefix + "_qsub.sh",
+            environment="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Env/bin/activate")
     
 
-    
-    
-    
-    #q_write([cmd], t=24, vmem=20, mem=20, out = out_file,          
-    #        environment="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Env/bin/activate")
-    
-
-    
-#with mp.Pool(mp.cpu_count()) as pool:
-#    df['md5'] = pool.starmap(calculate_hash_wrapper, zip(df['absolute_path'],df['size']))
-    
-    

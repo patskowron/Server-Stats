@@ -10,25 +10,20 @@ def testing_functions():
 
 def calculate_hash(filepath, hash_name="md5"):
     """Calculate the hash of a file. The available hashes are given by the hashlib module. The available hashes can be listed with hashlib.algorithms_available."""
-
     hash_name = hash_name.lower()
     if not hasattr(hashlib, hash_name):
         raise Exception('Hash algorithm not available : {}'\
             .format(hash_name))
-
     try:
-    
         with open(filepath, 'rb') as f:
             checksum = getattr(hashlib, hash_name)()
             for chunk in iter(lambda: f.read(4096), b''):
                 checksum.update(chunk)
-
             return checksum.hexdigest()
-    
     except IsADirectoryError:
-        
-        return None
-
+        return np.nan
+    except PermissionError:
+        return "PermissionError"
 
 def _recursive_folderstats(folderpath, items=None, hash_name=None,
                            ignore_hidden=False, depth=0, idx=1, parent_idx=0,
