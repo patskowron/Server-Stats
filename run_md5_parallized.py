@@ -1,14 +1,13 @@
 from folderstats import *
 import multiprocessing as mp
 import pandas as pd
-import os 
 import sys
 
 
 #The input and output arguements
 input_file=sys.argv[1]
 output_file=sys.argv[2]
-cores=sys.argv[3]
+cores=int(sys.argv[3])
 
 
 #input_file="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020/inode_md5sum_splits/clus1_md5_filelist.txt"

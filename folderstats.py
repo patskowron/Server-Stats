@@ -24,6 +24,8 @@ def calculate_hash(filepath, hash_name="md5"):
         return np.nan
     except PermissionError:
         return "PermissionError"
+    except FileNotFoundError:
+        return "FileNotFoundError"
 
 def _recursive_folderstats(folderpath, items=None, hash_name=None,
                            ignore_hidden=False, depth=0, idx=1, parent_idx=0,

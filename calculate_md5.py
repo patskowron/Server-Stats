@@ -1,33 +1,33 @@
 from folderstats import *
 from qsub import *
-from datetime import datetime
 import numpy as np
 from pathlib import Path
 import pandas as pd
-import humanize
-
+import sys
 
 #Global paths
-src_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Scripts/" #Where the scripts are stored
+src_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Scripts" #Where the scripts are stored
 
 #Parameters
-work_dir=sys.argv[1]
-work_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020/"
+#work_dir=sys.argv[1]
+#splits=sys.argv[2]
+#cores=sys.argv[3]
 
-#Parallization parameters
+work_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.17.2020/"
+splits=200
 cores=16
-splits=50
 
 #Combine all the outputed dataframes together 
+print("Loading all the file information...")
 df_list=[]    
-for f_name in os.listdir(work_dir):
+for f_name in os.listdir(os.path.join(work_dir,"folderstats")):
     if f_name.endswith('_folderstats.txt'):
+        df_list.append( pd.read_csv(os.path.join(work_dir, "folderstats", f_name), sep='\t'))
         print(f_name)
-        df_list.append( pd.read_csv(os.path.join(work_dir, f_name), sep='\t'))
-    
 df = pd.concat(df_list)
 
 #Extract the inodes keep only the first file location
+print("Finding unique inodes and spliting into groups...")
 unique_inodes=df.drop_duplicates(subset="inode", keep="first", inplace=False)
 
 #Shuffle the dataframe 
@@ -38,7 +38,8 @@ unique_inodes["split"], approx_size=equisum_partition(
     unique_inodes["size"].to_numpy(copy=True), splits, ignore=unique_inodes["folder"].to_numpy(copy=True))
 
 #Output the split list of unique file inodes and create qsub script to run parellelized md5 hashing
-out_dir=os.path.join(work_dir,"inode_md5sum_splits")
+print("Creating qsub script files...")
+out_dir=os.path.join(work_dir,"md5sums")
 Path(out_dir).mkdir(parents=True, exist_ok=True)
 for i in range(1,splits+1):
     
@@ -48,14 +49,14 @@ for i in range(1,splits+1):
     
     #Write md5 list on disk
     outfileprefix=os.path.join(out_dir, "clus{}_filelist".format(i))
-    out.to_csv(outfileprefix + "txt", sep="\t", index=False)
+    out.to_csv(outfileprefix + ".txt", sep="\t", index=False)
     
     #Creating md5 script for qsub submission
-    cmd="python {}run_md5_parallized.py {}.txt {}.md5 {}".format(src_dir, outfileprefix, outfileprefix, cores)
+    cmd="python {}/run_md5_parallized.py {}.txt {}.md5 {}".format(src_dir, outfileprefix, outfileprefix, cores)
     #rint(outfilename)
     #rint(cmd)
     
-    q_print([cmd], t=24, vmem=20, mem=20, out = outfileprefix + "_qsub.sh",
+    q_write([cmd], t=24, node='1:ppn=16', vmem=50, mem=50, out = outfileprefix,
             environment="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Env/bin/activate")
     
 
