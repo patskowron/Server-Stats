@@ -26,6 +26,9 @@ for f_name in os.listdir(os.path.join(work_dir,"folderstats")):
         print(f_name)
 df = pd.concat(df_list)
 
+#write the combined dataframe to file
+df.to_csv(os.path.join(work_dir,"folderstats","folderstats_combined.txt"), sep="\t", index=False)
+
 #Extract the inodes keep only the first file location
 print("Finding unique inodes and spliting into groups...")
 unique_inodes=df.drop_duplicates(subset="inode", keep="first", inplace=False)

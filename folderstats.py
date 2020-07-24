@@ -167,10 +167,11 @@ def equisum_partition(arr,p, ignore):
     return parts, partsum
 
 
-def calculate_hash_wrapper(file, size):
+def calculate_hash_wrapper(file, size, inode):
     
     startTime = datetime.now()
+    print("Starting","\t",size,"\t",file)
     md5=calculate_hash(file) 
-    print(file, "\t",md5, "\t", size, (datetime.now() - startTime).total_seconds())
+    print(inode, "\t",file, "\t",md5, "\t", size,"\t",(datetime.now() - startTime).total_seconds())
     
     return md5

@@ -8,7 +8,7 @@ import sys
 input_file=sys.argv[1]
 output_file=sys.argv[2]
 cores=int(sys.argv[3])
-
+verbose=True
 
 #input_file="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020/inode_md5sum_splits/clus1_md5_filelist.txt"
 #output_file="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020/inode_md5sum_splits/clus1_md5_filelist.md5"
@@ -18,8 +18,12 @@ df=pd.read_csv(input_file, sep='\t')
 
 #df=df.iloc[:1000,]
 
-with mp.Pool(cores) as pool:
-    df['md5'] = pool.starmap(calculate_hash, zip(df['absolute_path']))
+if verbose == True:
+    with mp.Pool(cores) as pool:
+        df['md5'] = pool.starmap(calculate_hash_wrapper, zip(df['absolute_path'], df['size'], df['inode']))       
+else:
+    with mp.Pool(cores) as pool:
+        df['md5'] = pool.starmap(calculate_hash, zip(df['absolute_path']))
 
 #Out to specidied file
 df.to_csv(output_file, sep="\t", index=False)
