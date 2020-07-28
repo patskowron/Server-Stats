@@ -5,8 +5,11 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 
-def testing_functions():
-    print ("Working fine!!")
+def calculate_hash_wrapper(args):
+    """Parallel Processing Wrapper for the calculate_hash function"""
+    file, inode=args
+    md5=calculate_hash(file, hash_name="md5") 
+    return (inode, md5)
 
 def calculate_hash(filepath, hash_name="md5"):
     """Calculate the hash of a file. The available hashes are given by the hashlib module. The available hashes can be listed with hashlib.algorithms_available."""
@@ -21,11 +24,15 @@ def calculate_hash(filepath, hash_name="md5"):
                 checksum.update(chunk)
             return checksum.hexdigest()
     except IsADirectoryError:
-        return np.nan
+        return "DirectoryError"
     except PermissionError:
         return "PermissionError"
     except FileNotFoundError:
         return "FileNotFoundError"
+    except TypeError:
+        return "TypeError"
+    else:
+        return "UnknownError"
 
 def _recursive_folderstats(folderpath, items=None, hash_name=None,
                            ignore_hidden=False, depth=0, idx=1, parent_idx=0,
@@ -167,11 +174,3 @@ def equisum_partition(arr,p, ignore):
     return parts, partsum
 
 
-def calculate_hash_wrapper(file, size, inode):
-    
-    startTime = datetime.now()
-    print("Starting","\t",size,"\t",file)
-    md5=calculate_hash(file) 
-    print(inode, "\t",file, "\t",md5, "\t", size,"\t",(datetime.now() - startTime).total_seconds())
-    
-    return md5
