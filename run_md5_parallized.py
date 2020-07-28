@@ -3,6 +3,7 @@ from concurrent.futures import TimeoutError
 from folderstats import *
 import pandas as pd
 import sys
+import time
 
 #Wrapper function for the parallel processing calls
 def calculate_hash_wrapper(args):
@@ -18,6 +19,7 @@ cores=int(sys.argv[3])
 
 #Global variables
 timeout_sec=1200
+start_time = time.time()
 
 #input_file="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020/inode_md5sum_splits/clus1_md5_filelist.txt"
 #output_file="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.13.2020/inode_md5sum_splits/clus1_md5_filelist.md5"
@@ -49,4 +51,6 @@ with ProcessPool(max_workers=cores) as pool:
             finally:
                 idx += 1
  
-
+#Print the runtime of the program
+time_ft=time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))
+print("Runtime: {}s".format(time_ft))
