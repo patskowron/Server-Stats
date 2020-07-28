@@ -13,8 +13,8 @@ src_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Scripts" #Where the s
 #splits=sys.argv[2]
 #cores=sys.argv[3]
 
-work_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.17.2020/"
-splits=200
+work_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.28.2020/"
+splits=300
 cores=16
 
 #Combine all the outputed dataframes together 
