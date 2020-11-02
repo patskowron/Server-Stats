@@ -23,7 +23,6 @@ df = folderstats(folderpath,
                  verbose=False)
 
 
-
 #Out to specidied file
 df.to_csv(df_output, sep="\t", index=False)
 
