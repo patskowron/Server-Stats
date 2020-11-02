@@ -4,7 +4,6 @@ import hashlib
 import pandas as pd
 from datetime import datetime
 import numpy as np
-from scandir import walk,scandir
 
 def calculate_hash_wrapper(args):
     """Parallel Processing Wrapper for the calculate_hash function"""
@@ -175,25 +174,3 @@ def equisum_partition(arr,p, ignore):
     return parts, partsum
 
 
-
-test="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data"
-def list_directories(path):
-    dir_list = []
-    for entry in scandir(path):
-        if entry.is_dir():
-            dir_list.append(entry.path)
-            dir_list.extend(list_directories(entry.path))
-            
-            
-def list_directories(path):
-    file_list = []
-    for entry in scandir(path):        
-        if not entry.name.startswith('.') and entry.is_dir(follow_symlinks=False):
-            list_directories(entry.path)
-        else:
-            if entry.is_file(follow_symlinks=False):
-                out=[entry.path, entry.inode(), entry.stat().st_size, entry.stat().st_uid, entry.stat().st_nlink]
-                file_list.append(out)       
-    return file_list
-    
-#ary=list_directories(test)
