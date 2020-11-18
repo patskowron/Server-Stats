@@ -13,19 +13,21 @@ src_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Scripts" #Where the s
 #splits=sys.argv[2]
 #cores=sys.argv[3]
 
-work_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/07.28.2020/"
+work_dir="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Data/11.02.2020/"
 splits=300
 cores=16
 
 #Combine all the outputed dataframes together 
+set_dtype={"id": np.float64, "size": np.float64, "folder": bool, "num_files" : np.float64, "depth" : np.float64, "parent" : np.float64, "uid" : np.float64, "inode" : np.float64, "num_hard_links" : np.float64}
 print("Loading all the file information...")
 df_list=[]    
 for f_name in os.listdir(os.path.join(work_dir,"folderstats")):
     if f_name.endswith('_folderstats.txt'):
-        df_list.append( pd.read_csv(os.path.join(work_dir, "folderstats", f_name), sep='\t'))
         print(f_name)
+        df_list.append( pd.read_csv(os.path.join(work_dir, "folderstats", f_name), sep='\t', dtype=set_dtype))
 df = pd.concat(df_list)
 
+#write the combined dataframe to file
 #write the combined dataframe to file
 df.to_csv(os.path.join(work_dir,"folderstats","folderstats_combined.txt"), sep="\t", index=False)
 
@@ -63,3 +65,10 @@ for i in range(1,splits+1):
             environment="/hpf/largeprojects/mdtaylor/patryks/Server_Police/Env/bin/activate")
     
 
+
+    
+find=pd.to_numeric(unique_inodes["size"], errors='coerce')
+unique_inodes=unique_inodes[~find.isnull()]
+
+
+unique_inodes["folder"] = (unique_inodes["folder"] == True)
